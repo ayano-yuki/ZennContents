@@ -1,5 +1,5 @@
 ---
-title: "【Gitの備忘録】基本コマンドとそれの解説"
+title: "【Gitの備忘録】基本コマンドとその解説"
 emoji: "📓"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["github"]
