@@ -1,8 +1,3 @@
-# 執筆中
-- 【Gitの備忘録】基本コマンドとその解説(memorandum-git-01-basic)
-- 【OpenPLCの備忘録】modbus RTU通信の使い方(memorandum-openplc-01-modbus_rtu)
-- 【セキュリティのアウトプット】最凶のマルウェアEmotetについて(note-security-01-emotet)
-
 # 書きたい記事
 - 【Conohaの備忘録】Conoha VPSを使ったVPN構築(memorandum-conoha_vps_ubuntu-vpn)
 - 【Softetherの備忘録】Softether VPN ServerのCUI操作(memorandum-softether_vpn_server-cui)
@@ -11,3 +6,6 @@
 - 【Python】Pythonを使ったパワーポイントの生成(tech-python-02-create_power_point)
 - 【Python】FastAPIの非同期処理(tech-python-03-fastapi_backgroundtasks)
 - 【ポートフォリオ】集団作業効率における個人能力と団結力の重要性について(work-simulation-01-mas_team_play)
+- 【Gitの備忘録】基本コマンドとその解説(memorandum-git-01-basic)
+- 【OpenPLCの備忘録】modbus RTU通信の使い方(memorandum-openplc-01-modbus_rtu)
+- 【セキュリティのアウトプット】最凶のマルウェアEmotetについて(note-security-01-emotet)
