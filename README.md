@@ -1,3 +1,7 @@
+# Zenn cliの使い方
+- [Zenn CLIで記事・本を管理する方法](https://zenn.dev/zenn/articles/zenn-cli-guide)
+- [ZennのMarkdown記法一覧](https://zenn.dev/zenn/articles/markdown-guide)
+
 # 書きたい記事
 - 【Conohaの備忘録】Conoha VPSを使ったVPN構築(memorandum-conoha_vps_ubuntu-vpn)
 - 【Softetherの備忘録】Softether VPN ServerのCUI操作(memorandum-softether_vpn_server-cui)
