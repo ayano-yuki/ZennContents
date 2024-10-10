@@ -2,7 +2,7 @@
 title: "【Conohaの備忘録】Conoha VPSを使ったVPN構築"
 emoji: "📓"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["conoha vps", "softeher", "vpn", "output"]
+topics: ["conoha", "softeher", "vpn"]
 published: false
 ---
 # はじめに
@@ -13,7 +13,11 @@ VPNの構築に苦戦したアヤノです。
 
 # 使用する環境
 
+# VPSの準備
+
 # VPNの構築
+
+# ダイナミックDNSの設定
 
 # まとめ
 

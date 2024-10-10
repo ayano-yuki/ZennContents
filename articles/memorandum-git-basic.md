@@ -2,7 +2,7 @@
 title: "【Gitの備忘録】基本コマンドとその解説"
 emoji: "📓"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["github", "output"]
+topics: ["git", "github"]
 published: true
 ---
 # はじめに
