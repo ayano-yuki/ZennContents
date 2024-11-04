@@ -3,7 +3,7 @@ title: "【ポートフォリオ】SeekWords Creator"
 emoji: "🎁"
 type: "idea"
 topics: [Vue, Python, portfolio]
-published: false
+published: true
 ---
 # はじめに
 こんにちは！
