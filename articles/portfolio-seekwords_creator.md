@@ -13,7 +13,7 @@ published: true
 今までは開発したものを紹介してこなかったのですが、開発した時の思いが風化するのが嫌で今回から記事として記録を残すことにしました。今後もこのような記事を投稿すると思いますが、温かい目で見守って下さい m(_ _;)m
 
 # 概要
-![overview](/Images/articles/portfolio-seekwords_creator/overview.png)
+![overview](/images/articles/portfolio-seekwords_creator/overview.png)
 
 SeekWords Creatorは、**失語症患者のリハビリテーション教材作成支援のためのWebアプリ**です。
 
@@ -40,7 +40,7 @@ SeekWords Creatorは、**失語症患者のリハビリテーション教材作�
 ホーム画面では、シークワーズの生成に必要な情報を入力します。
 シークワーズの生成には、単語（ひらがな）が書かれたtxtファイル、シークワーズのサイズの2つの情報が必要です。
 
-![/](/Images/articles/portfolio-seekwords_creator/view_home.png)
+![/](/images/articles/portfolio-seekwords_creator/view_home.png)
 1. テンプレートファイル（.txt）のダウンンロード
    - シークワーズの生成に使用する単語（ひらがな）を書くtxtファイルの見本をダウンロードする機能です。
    - ダウンンロードされる「template.txt」の中身は以下のようになっていています。アプリ側が単語として認識するものは、**2～5文字のひらがな＋改行**の形式だけです。（プログラムをいじれば、単語の認識の仕組みは変更できます！）
@@ -65,7 +65,7 @@ SeekWords Creatorは、**失語症患者のリハビリテーション教材作�
 ## シークワーズ生成画面（/create）
 シークワーズ生成画面では、生成されたシークワーズと、その解答の確認・ダウンンロードを行います。
 
-![/](/Images/articles/portfolio-seekwords_creator/view_create.png)
+![/](/images/articles/portfolio-seekwords_creator/view_create.png)
 1. シークワーズ（.pdf）のダウンンロード
    - 生成されたシークワーズをダウンロードする機能です。
 2. 解答（シークワーズ内にある単語, .txt）のダウンンロード
@@ -73,7 +73,7 @@ SeekWords Creatorは、**失語症患者のリハビリテーション教材作�
    - 与えられた単語＋形態素解析で見つけた名詞を解答としているので、変な名詞が含まれている可能性があります。そのため、このアプリを使用して作成したシークワーズを使用する際は、解答として使用する単語を吟味することをお勧めします。
 
 # 使用技術
-![](/Images/articles/portfolio-seekwords_creator/overview-thec.png)
+![](/images/articles/portfolio-seekwords_creator/overview-thec.png)
 
 ## 技術スタック
 - Frontend
