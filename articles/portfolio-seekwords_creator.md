@@ -65,7 +65,7 @@ SeekWords Creatorは、**失語症患者のリハビリテーション教材作�
 ## シークワーズ生成画面（/create）
 シークワーズ生成画面では、生成されたシークワーズと、その解答の確認・ダウンンロードを行います。
 
-![/](/images/articles/portfolio-seekwords_creator/view_create.png)
+![/create](/images/articles/portfolio-seekwords_creator/view_create.png)
 1. シークワーズ（.pdf）のダウンンロード
    - 生成されたシークワーズをダウンロードする機能です。
 2. 解答（シークワーズ内にある単語, .txt）のダウンンロード
@@ -73,7 +73,7 @@ SeekWords Creatorは、**失語症患者のリハビリテーション教材作�
    - 与えられた単語＋形態素解析で見つけた名詞を解答としているので、変な名詞が含まれている可能性があります。そのため、このアプリを使用して作成したシークワーズを使用する際は、解答として使用する単語を吟味することをお勧めします。
 
 # 使用技術
-![](/images/articles/portfolio-seekwords_creator/overview-thec.png)
+![overview-tec](/images/articles/portfolio-seekwords_creator/overview-thec.png)
 
 ## 技術スタック
 - Frontend
