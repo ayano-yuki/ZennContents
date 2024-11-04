@@ -22,7 +22,7 @@ data:text/html,<html contenteditable>
 
 https://twitter.com/lotz84_/status/1543915415491194880
 
-# ２．ほしい物リストの総額を調べられる
+# ２．ほしい物リストの総額を調べられるJavaScript
 このJavaScriptは、amazonのリスト形式で表示されている欲しいものリスト内の総額を調べるためのモノです。これをブックマークして、総額を知りたい欲しいものリストを表示している状態でクリックすると、総額がアラートで表示されます。開発者ツールのconsoleから総額を調べるJavaScriptも以下の記事に書いているので、気になる方はぜひ読んでみてください。
 
 ```js
@@ -32,7 +32,6 @@ javascript:alert('合計:'+[...document.querySelectorAll('.a-price-whole')].map(
 このJavaScriptコードは、Webページ上で特定のクラス名を持つ要素（.a-price-whole）のテキスト内容を数値として合計し、その結果をアラートで表示するモノです。要素の名前を変更することで、他のサイトや他の形式にも応用できそうです。
 
 https://qiita.com/gshirato/items/17300422c78ab4a7ccd0
-
 
 
 [^1]: ファイルシステム上のファイルへのパスではなく、データそのものをURLの中に埋め込むことができる仕組み（画像や音声ファイル以外にも、HTMLドキュメントも埋め込める！）
