@@ -28,11 +28,7 @@ Imos法（いもす法）は、特定の区間に対して連続的に行う累�
 ![imos](/images/articles/memorandum-algorithm_completely_understand/imoshou.png)
 *imos法のアルゴリズム*
 
-## 重要な点
-- 繰り返し処理で累積和をするのではなく、開始地点と終了地点に加算・減算する
-- 前の累積和の結果を次の累積和に加算する
-
-:::details 例
+:::details プログラムの例
 通常は、特定の区間に大して連続で累積和を行う場合は、以下のようになります。この例だと、計算量がO(Q*N)となり、膨大になります。
 ```python
 arr = [1, 2, 3, 4, 5]
@@ -66,9 +62,10 @@ print(*arr) # 1 3 7 15 31
 ```
 :::
 
-:::details imos法を使うAtCoderの問題
-- HHKBプログラミングコンテスト2025(AtCoder Beginner Contest 388)のD問題
-  - https://atcoder.jp/contests/abc388/tasks/abc388_d
-:::
+## 重要な点
+- 繰り返し処理で累積和をするのではなく、開始地点と終了地点に加算・減算する
+- 今の累積和の結果を次の累積和に加算する
+
+
 
 [^1]: 累積和の回数がQ、配列長がNです。
