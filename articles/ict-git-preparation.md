@@ -1,5 +1,5 @@
 ---
-title: "沖縄高専ICT委員会技術継承　Git/GitHub編　01-事前準備"
+title: "沖縄高専ICT委員会技術継承　Git/GitHub編　#01-事前準備"
 emoji: "🔥"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["git", "github"]
@@ -176,13 +176,13 @@ SSHの設定をするメリットは以下の通りです。
 2. clipコマンドを使って生成された「id_ed25519_github.pub」の中身をコピーする。（生成場所は.sshです。調べたらどこにあるか分かります。）
    ```sh
    clip < "保存場所（ココは調べて下さい。）"/id_ed25519_github.pub
-
    ```
 3. 公開鍵を[GitHub](https://github.com/settings/ssh/new)にアップロードする。適当なtitleをつけて、keyのフォームにコピーした内容を貼り、「Add SSH key」で登録する。
    ![](/images/articles/ict-git-preparation/195.png)
    
 4. "id_ed25519_github.pubの保存場所（ココは調べて下さい。）"/configを編集する。"id_ed25519_github.pubの保存場所（ココは調べて下さい。）"/configが無ければ、作成し、以下の内容を追記する。
     ```sh
+    # "id_ed25519_github.pubの保存場所（ココは調べて下さい。）"/configに追記
     Host github.com
         HostName github.com
         IdentityFile ~/.ssh/id_ed25519_github
