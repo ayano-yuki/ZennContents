@@ -185,24 +185,19 @@ git commit -m "!!!を追加"  # test ブランチにコミット
 
 これで `test` ブランチに新しいコミットが追加されました。
 
-## 4. master ブランチに切り替える
-元の `master` ブランチに戻ります。
-
-```bash
-git switch master  # 強制リセットなしで安全に切り替え
-```
-
-`master` ブランチの内容が表示されるはずです。
-
-## 5. 各ブランチの内容確認
+## 4. 各ブランチの内容確認
 実際に、各ブランチでファイルの内容がどう変わるか確認してみましょう。
 
 ```bash
-cat memo.txt  # 期待される出力: "hello git"
+# master ブランチに切り替えて確認
+git switch master
+type memo.txt  # 使用しているOSがwindows以外はcatに読み替える
+# 期待される出力: "hello git"
 
 # test ブランチに切り替えて確認
 git switch test
-cat memo.txt  # 期待される出力: "hello git!!!"
+type memo.txt  # 使用しているOSがwindows以外はcatに読み替える
+# 期待される出力: "hello git!!!"
 ```
 
 このように、ブランチごとにファイルの内容が異なることを確認でき、gitでバージョン管理が出来ました。
