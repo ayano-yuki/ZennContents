@@ -12,46 +12,6 @@ Hey Guys!
 第1章では、この講座を受けるための事前準備を行います。
 講座を受ける方は必ずやってください!!!
 
-# GitHubの用意
-この章では、GitHubの登録について説明します。
-講座をする上での最低限の登録しかしないため、学生は無料で利用できる有料プランの設定や二段階認証は、各自で対応してください。。
-
-## GitHubとは
-![](/images/articles/ict-git-preparation/GitHub-Logo.png)
-GitHubは、インターネット上で「コード（プログラム）」を管理する場所です。簡単に言うと、GitHubは「コードを保存したり、他の人と共有したり、みんなで一緒に作業したりするための場所」と考えるとわかりやすいです。
-
-例えば、友達と一緒に宿題をしているときに、みんなで書いたノートを一つのファイルにまとめて共有したい時がありますよね。GitHubはまさにそのような役割を果たします。コードという「ノート」をオンラインで保管し、みんなで使ったり、修正したり、改善したりできる場所です。
-
-## GitHubの登録
-1. [GitHub公式ページ](https://github.com/)に行き、「Sign up」をクリックします。
-    ![](/images/articles/ict-git-preparation/192.png)
-1. メールアドレス（Email）、パスワード（Password）、ユーザー名（Username）を入力し、「Continue」をクリックします。
-   ![](/images/articles/ict-git-preparation/193.png)
-1. 3ステップの登録認証があるので、対応する。
-   - 検証ボタンを押す
-   - ロボット認証をする
-   - 認証コードを入力する（登録したメールアドレスにGitHubから認証コードが来る）
-1. ログイン画面に飛んだり、アンケート画面等に飛ぶので、対応する。
-1. 登録完了！
-
-:::details 参考になりそうなサイト
-上記の説明でよくわからない場合は、以下を見ながら登録してください。
-- [【2025年最新】GitHub無料でアカウント作成する方法を解説！](https://working-class-hero.net/blog/1946/)
-- [GitHub でのアカウントの作成](https://docs.github.com/ja/get-started/start-your-journey/creating-an-account-on-github)
-- [【GitHub入門】初心者向け！GitHubでチーム開発するための基本操作を解説！](https://www.youtube.com/watch?v=Dz95iUNt-fg)
-- 登録の部分だけでOK、
-:::
-
-::: details (やらなくても良いやつ)
-1. 学生は無料で利用できる有料プランの設定
-   - [学生のための GitHub Education について](https://docs.github.com/ja/education/explore-the-benefits-of-teaching-and-learning-with-github-education/github-education-for-students/about-github-education-for-students)
-   - [Github Education の申請方法](https://zenn.dev/iizuka0000/articles/how-to-apply-for-github-education)
-
-2. 二段階認証
-   - [2 要素認証を設定する](https://docs.github.com/ja/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication)
-   - [【大事！】GitHubアカウントで2段階認証を有効化する](https://qiita.com/kanamekun/items/c307c942508e9d64c35b)
-:::
-
 # Gitの用意
 この章では、Gitのインストール方法について説明します。
 
@@ -114,7 +74,7 @@ ScoopというWindows非公式のパッケージ管理ツールを使ってコ�
 git --version
 ```
 
-# 初期設定
+# Gitの初期設定
 最後にGitとGitHubの基礎設定を行います。
 
 この章を進めるにあたってのお願いです。
@@ -160,6 +120,46 @@ proxy（プロキシ）は、インターネットの通信を仲介する仕組
 
 ただし、proxyが不要な環境でこの設定をしてしまうと、Gitが存在しないproxyを探しに行ってしまい、通信がタイムアウトすることがあります。そのため、学内（proxy環境下）でのみ有効にし、学外では解除するようにしてください。
 ::: 
+
+# GitHubの用意
+この章では、GitHubの登録について説明します。
+講座をする上での最低限の登録しかしないため、学生は無料で利用できる有料プランの設定や二段階認証は、各自で対応してください。。
+
+## GitHubとは
+![](/images/articles/ict-git-preparation/GitHub-Logo.png)
+GitHubは、インターネット上で「コード（プログラム）」を管理する場所です。簡単に言うと、GitHubは「コードを保存したり、他の人と共有したり、みんなで一緒に作業したりするための場所」と考えるとわかりやすいです。
+
+例えば、友達と一緒に宿題をしているときに、みんなで書いたノートを一つのファイルにまとめて共有したい時がありますよね。GitHubはまさにそのような役割を果たします。コードという「ノート」をオンラインで保管し、みんなで使ったり、修正したり、改善したりできる場所です。
+
+## GitHubの登録
+1. [GitHub公式ページ](https://github.com/)に行き、「Sign up」をクリックします。
+    ![](/images/articles/ict-git-preparation/192.png)
+1. メールアドレス（Email）、パスワード（Password）、ユーザー名（Username）を入力し、「Continue」をクリックします。
+   ![](/images/articles/ict-git-preparation/193.png)
+1. 3ステップの登録認証があるので、対応する。
+   - 検証ボタンを押す
+   - ロボット認証をする
+   - 認証コードを入力する（登録したメールアドレスにGitHubから認証コードが来る）
+1. ログイン画面に飛んだり、アンケート画面等に飛ぶので、対応する。
+1. 登録完了！
+
+:::details 参考になりそうなサイト
+上記の説明でよくわからない場合は、以下を見ながら登録してください。
+- [【2025年最新】GitHub無料でアカウント作成する方法を解説！](https://working-class-hero.net/blog/1946/)
+- [GitHub でのアカウントの作成](https://docs.github.com/ja/get-started/start-your-journey/creating-an-account-on-github)
+- [【GitHub入門】初心者向け！GitHubでチーム開発するための基本操作を解説！](https://www.youtube.com/watch?v=Dz95iUNt-fg)
+- 登録の部分だけでOK、
+:::
+
+::: details (やらなくても良いやつ)
+1. 学生は無料で利用できる有料プランの設定
+   - [学生のための GitHub Education について](https://docs.github.com/ja/education/explore-the-benefits-of-teaching-and-learning-with-github-education/github-education-for-students/about-github-education-for-students)
+   - [Github Education の申請方法](https://zenn.dev/iizuka0000/articles/how-to-apply-for-github-education)
+
+2. 二段階認証
+   - [2 要素認証を設定する](https://docs.github.com/ja/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication)
+   - [【大事！】GitHubアカウントで2段階認証を有効化する](https://qiita.com/kanamekun/items/c307c942508e9d64c35b)
+:::
 
 # おわりに
 事前準備、お疲れさまでした。
