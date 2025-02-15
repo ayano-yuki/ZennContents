@@ -3,7 +3,7 @@ title: "Fuwariのカスタマイズ：Astroでポートフォリオを作る"
 emoji: "🐨"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [Astro]
-published: false
+published: true
 ---
 # はじめに
 こんにちは、アヤノです。
