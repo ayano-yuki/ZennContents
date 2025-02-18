@@ -2,7 +2,7 @@
 title: "Fuwariのカスタマイズ：Astroでポートフォリオサイトを作る"
 emoji: "🎁"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: [Astro]
+topics: [Astro, portfolio]
 published: true
 ---
 # はじめに
@@ -151,6 +151,14 @@ Powered by Astro & Fuwari
 <project name>\src\config.ts    # siteConfigを編集
 ```
 
+## ライセンスの非表示
+現状では、記事の最下部にライセンスが表示されます。
+ライセンスが表示されていてもポートフォリオサイトには影響ありませんが、ポートフォリオサイトに必要な情報ではないので非表示にします。
+
+編集するファイルは、以下のファイルです。
+```sh
+<project name>\src\pages\posts\[...slug].astro  # 107行目をコメントアウト
+```
 
 ## Aboutの編集
 Aboutページをポートフォリオサイトの「私について」にするために編集します。
