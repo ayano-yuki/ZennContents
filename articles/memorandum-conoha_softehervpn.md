@@ -226,7 +226,7 @@ WantedBy=multi-user.target
 
 ### softetherのiptablesの設定
 VPNに接続されたデバイスにIPアドレスを配布するための設定を行います。
-ここの設定には、NIC名とVPSのIPアドレスが必要になります。
+ここの設定には、**NIC名**と**VPSのIPアドレス**が必要になります。
 `sudo vim /root/softether-iptables.sh`で設定ファイルを作成し、以下の内容を入力してください。
 ```sh
 #!/bin/bash
@@ -248,6 +248,8 @@ iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -s $VPN_SUBNET -m state --state NEW -j ACCEPT
 iptables -A OUTPUT -s $VPN_SUBNET -m state --state NEW -j ACCEPT
 iptables -A FORWARD -s $VPN_SUBNET -m state --state NEW -j ACCEPT
+
+ufw enable
 ```
 
 ファイルの作成が出来たら、スクリプトに実行権限を付与します。
@@ -258,8 +260,8 @@ sudo chmod +x /root/softether-iptables.sh
 ## dnsmasqの設定
 VPNとの接続が出来たら、VPNを経由して通信をします。
 その時に使用するプライベートIPアドレスを配布するためDNSサーバーを設定します。
-`sudo /etc/dnsmasq.conf`で設定ファイルを開き、以下で上書きしてください。
-ここの設定には、NIC名が必要になります。
+`sudo vim /etc/dnsmasq.conf`で設定ファイルを開き、以下で上書きしてください。
+ここの設定には、**NIC名**が必要になります。
 上書きが怖いなら、既存のファイルを`sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf-backup`でバックアップを取ってください。
 ```sh
 # In this case it is the Softether bridge
@@ -410,15 +412,6 @@ exit
 ```sh
 reboot
 ```
-
-:::message alert
-再起動をすると、ファイアウォールが無効になり、SSHも出来なくなります。
-そのため、再起動をしたら、conohaのコンソールからファイヤーウォールを有効化させてください。
-```sh
-sudo ufw enable
-```
-:::
-
 ここで解放したポートは、conohaのサーバーの管理者画面にある「ネットワーク情報>セキュリティグループ」でも設定する必要があります。
 設定は、[セキュリティグループ機能を使う](https://support.conoha.jp/v/v3-security-securitygroup/)を参照して行ってください。
 
@@ -485,7 +478,6 @@ VPNに接続するための設定が出来たら、今設定した接続設定�
 
 # おわりに
 私が行ったConoHa VPSを使用してSoftEther VPNの環境を作成し、VPNの構築方法を纏めました。
-しかし、「VPSを再起動すると、ufwの自動起動＋ルールの自動有効化がされない点」が課題点として残っているので、時間がある時に解決方法を模索します。
 
 
 # 参考文献
