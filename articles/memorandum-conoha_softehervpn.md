@@ -97,9 +97,9 @@ scp [key_name].pub [user_name]@[your_vps_ip]:~/.ssh/authorized_keys
 
 作成した公開鍵がアップロード出来たら、以下のコマンドでログインしてください。
 ```bash
-ssh [user_name]@[your_vps_ip] -i 'conoha.pub'
+ssh [user_name]@[your_vps_ip] -i conoha.pub
 ```
-:::details 「ssh [user_name]@[your_vps_ip] -i 'conoha.pub」と打つのが面倒くさいと感じた人へ
+:::details 「`ssh [user_name]@[your_vps_ip] -i conoha.pub`」と打つのが面倒くさいと感じた人へ
 Windows系のOSを使っている人は、以下のサイトを参考にして、
 .sshフォルダ内にあるconfigを設定すると、「ssh 任意の名前」でSSH接続ができるようになります。
 [Windows10のOpenSSHでconfig使ってSSH接続](https://meshikui.com/2018/09/11/949/)
@@ -130,24 +130,30 @@ PasswordAuthentication no
 sudo systemctl restart sshd.service
 ```
 
-## VPNの構築に必要な作業
-ここまで出来たら、VPNの構築に必要な作業を行います。
-初めに、OSの更新と、VPNの構築に使用するパッケージのインストールを行います。
+## Ubuntuの更新と、パッケージのインストール
+OSの更新と、VPNの構築に使用するパッケージのインストールを行います。
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y gcc make dnsmasq net-tools
 ```
 
-次に、VPNの構築に必要なNIC名と、VPSのIPアドレスを調べます。
-```bash
-# NIC名(eth0、enp1s0みたいな名前がそれです)
-ifconfig
-
-# VPSのIPアドレス
-curl globalip.me
-```
-
 # VPNの構築
+SoftEther VPNの構築を行います。
+構築の手順は、以下の通りです。
+1. softetherのインストール
+2. softetherの設定
+   1. softetherの起動
+   2. パスワードの設定
+   3. 仮想HUBの作成と設定
+   4. softetherの自動起動設定
+   5. VPN構築に必要な情報の収集（NIC名、IPアドレス）
+   6. softetherのiptablesの設定
+3. dnsmasqの設定
+4. NATの設定
+5. ファイヤーウォールの設定
+6. VPNとDNSの起動
+
+
 ## softetherのインストール
 下記のコマンドでsoftether v4.42-9798をインストールします。
 最新のものをインストールしたい場合は、URLを書き換えてください。
@@ -197,7 +203,7 @@ UserPasswordSet [account_name] /PASSWORD:[account_password]
 exit
 ```
 
-### softetherを自動起動
+### softetherの自動起動設定
 Softetherをサービスとして自動起動させるための設定を行います。
 `sudo vim /lib/systemd/system/vpnserver.service`で設定ファイルを作成し、以下の内容を入力してください。
 ```sh
@@ -222,6 +228,16 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+```
+
+### VPN構築に必要な情報の収集（NIC名、IPアドレス）
+VPNの構築に必要なNIC名と、VPSのIPアドレスを調べます。
+```bash
+# NIC名(eth0、enp1s0みたいな名前がそれです)
+ifconfig
+
+# VPSのIPアドレス
+curl globalip.me
 ```
 
 ### softetherのiptablesの設定
