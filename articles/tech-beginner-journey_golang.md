@@ -13,9 +13,13 @@ published: false
 ちなみに、フロントエンド編、Android編、ios編を書くかもです。
 
 # 勉強に使ったサイト
-今回の勉強で使ったサイトは以下にあるものです。基本的には、A Tour of Goで勉強し、その他のサイトで補足していくように勉強しました。
+今回の勉強で使ったサイトは以下にあるものです。文法は基本的にA Tour of Goで勉強し、その他のサイトで理解が甘い箇所を補足していくように勉強しました。
 
-- [A Tour of Go](https://go-tour-jp.appspot.com/welcome/1)
+- 文法
+  - [A Tour of Go](https://go-tour-jp.appspot.com/list)
+  - [Effective Go — プログラミング言語 Go ドキュメント v0.1 documentation](http://go.shibu.jp/effective_go.html)
+- コーディングスタイル
+  - aaa
 
 # 文法: Basics
 ## Imports
@@ -660,3 +664,250 @@ func main() {
 ```
 
 ## Interfaces
+interfaceは、メソッドのシグニチャの集まりで定義される。インターフェースの値のメソッドを呼び出すと、その基底型の同じ名前のメソッドが実行される。
+```go
+package main
+
+import "fmt"
+
+type I interface {
+	M()
+}
+
+type T struct {
+	S string
+}
+
+func (t *T) M() {
+	if t == nil {
+		fmt.Println("<nil>")
+		return
+	}
+	fmt.Println(t.S)
+}
+
+func main() {
+	var i I
+
+	var t *T
+	i = t
+	describe(i)
+	i.M()
+
+	i = &T{"hello"}
+	describe(i)
+	i.M()
+}
+
+func describe(i I) {
+	fmt.Printf("(%v, %T)\n", i, i)
+}
+```
+
+## Type assertions
+型アサーション は、インターフェースの値の基になる具体的な値を利用する手段を提供する。
+例えば、`t := i.(T)`は、インターフェースの値 i が具体的な型 T を保持し、基になる T の値を変数 t に代入することを主張する。i が T を保持していない場合、この文は panic を引き起こす。
+
+インターフェースの値が特定の型を保持しているかどうかを テスト するために、型アサーションは2つの値(基になる値とアサーションが成功したかどうかを報告するブール値)を返すことができる。これをプログラムで書くと`t, ok := i.(T)`となり、i が T を保持していれば、 t は基になる値になり、 ok は真(true)になる。そうでなければ、 ok は偽(false)になり、 t は型 T のゼロ値になり panic は起きない。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var i interface{} = "hello"
+
+	s := i.(string)
+	fmt.Println(s)
+
+	s, ok := i.(string)
+	fmt.Println(s, ok)
+
+	f, ok := i.(float64)
+	fmt.Println(f, ok)
+
+	f = i.(float64) // panic
+	fmt.Println(f)
+}
+```
+
+## Type switches
+型switch はいくつかの型アサーションを直列に使用できる構造である。型switchは通常のswitch文と似ていますが、型switchのcaseは型(値ではない)を指定し、それらの値は指定されたインターフェースの値が保持する値の型と比較される。
+```go
+package main
+
+import "fmt"
+
+func do(i interface{}) {
+	switch v := i.(type) {
+	case int:
+		fmt.Printf("Twice %v is %v\n", v, v*2)
+	case string:
+		fmt.Printf("%q is %v bytes long\n", v, len(v))
+	default:
+		fmt.Printf("I don't know about type %T!\n", v)
+	}
+}
+
+func main() {
+	do(21)
+	do("hello")
+	do(true)
+}
+```
+
+# 文法: Concurrency
+## Goroutines
+goroutine (ゴルーチン)は、Goのランタイムに管理される軽量なスレッドである。`go f(x, y, z)`と書けば、新しいgoroutineが実行される。
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func say(s string) {
+	for i := 0; i < 5; i++ {
+		time.Sleep(100 * time.Millisecond)
+		fmt.Println(s)
+	}
+}
+
+func main() {
+	go say("world")
+	say("hello")
+}
+
+```
+
+## Channels
+チャネル( Channel )型は、チャネルオペレータの <- を用いて値の送受信ができる通り道である。マップとスライスのように、チャネルは使う前に`ch := make(chan int)`のように生成する。
+```go
+package main
+
+import "fmt"
+
+func sum(s []int, c chan int) {
+	sum := 0
+	for _, v := range s {
+		sum += v
+	}
+	c <- sum // send sum to c
+}
+
+func main() {
+	s := []int{7, 2, 8, -9, 4, 0}
+
+	c := make(chan int)
+	go sum(s[:len(s)/2], c)
+	go sum(s[len(s)/2:], c)
+	x, y := <-c, <-c // receive from c
+
+	fmt.Println(x, y, x+y)
+}
+```
+
+## Buffered Channels
+チャネルは バッファ ( buffer )として使え、バッファを持つチャネルを初期化するには、 make の２つ目の引数にバッファの長さを与える。バッファが詰まった時はチャネルへの送信をブロックし、バッファが空の時にはチャネルの受信をブロックする。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ch := make(chan int, 2)
+	ch <- 1
+	ch <- 2
+	fmt.Println(<-ch)
+	fmt.Println(<-ch)
+}
+```
+
+## Range and Close
+送り手は、これ以上の送信する値がないことを示すため、チャネルを close できる。 受け手は、受信の式に2つ目のパラメータを割り当てることで、そのチャネルがcloseされているかどうかを確認できる。
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func fibonacci(n int, c chan int) {
+	x, y := 0, 1
+	for i := 0; i < n; i++ {
+		c <- x
+		x, y = y, x+y
+	}
+	close(c)
+}
+
+func main() {
+	c := make(chan int, 10)
+	go fibonacci(cap(c), c)
+	for i := range c {
+		fmt.Println(i)
+	}
+}
+```
+
+## Select
+select ステートメントは、goroutineを複数の通信操作で待たせる。select は、複数ある case のいずれかが準備できるようになるまでブロックし、準備ができた case を実行する。もし、複数の case の準備ができている場合、 case はランダムに選択される。
+```go
+package main
+
+import "fmt"
+
+func fibonacci(c, quit chan int) {
+	x, y := 0, 1
+	for {
+		select {
+		case c <- x:
+			x, y = y, x+y
+		case <-quit:
+			fmt.Println("quit")
+			return
+		}
+	}
+}
+
+func main() {
+	c := make(chan int)
+	quit := make(chan int)
+	go func() {
+		for i := 0; i < 10; i++ {
+			fmt.Println(<-c)
+		}
+		quit <- 0
+	}()
+	fibonacci(c, quit)
+}
+```
+
+どの case も準備ができていないのであれば、 select の中の default が実行される。ブロックせずに送受信するなら、 default の case を使う。
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	tick := time.Tick(100 * time.Millisecond)
+	boom := time.After(500 * time.Millisecond)
+	for {
+		select {
+		case <-tick:
+			fmt.Println("tick.")
+		case <-boom:
+			fmt.Println("BOOM!")
+			return
+		default:
+			fmt.Println("    .")
+			time.Sleep(50 * time.Millisecond)
+		}
+	}
+}
+```
+
