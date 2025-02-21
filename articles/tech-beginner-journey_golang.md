@@ -17,7 +17,7 @@ published: false
 
 - [A Tour of Go](https://go-tour-jp.appspot.com/welcome/1)
 
-# 文法
+# 文法: Basics
 ## Imports
 プログラム内で使用するパッケージ（ライブラリ）を読み込むために書く。何も使わない場合は書かなくてもOK！
 ```go
@@ -212,3 +212,451 @@ func main() {
 ```
 
 ## Switch
+Switch文は他の言語と同じな書き方をするが、Goのswitchのcaseは定数である必要はなく、 関係する値は整数である必要はないということが特徴である。また、switch caseは、上から下へcaseを評価し、caseの条件が一致すれば、そこで自動的にbreakする。
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	fmt.Println("When's Saturday?")
+	today := time.Now().Weekday()
+	switch time.Saturday {
+	case today + 0:
+		fmt.Println("Today.")
+	case today + 1:
+		fmt.Println("Tomorrow.")
+	case today + 2:
+		fmt.Println("In two days.")
+	default:
+		fmt.Println("Too far away.")
+	}
+}
+```
+
+## Defer
+deferは、 deferへ渡した関数の実行を、呼び出し元の関数の終わり(returnする)まで遅延させる。defer へ渡した関数の引数は、すぐに評価されますが、その関数自体は呼び出し元の関数がreturnするまで実行されない。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var i int = 1;
+	defer fmt.Println("i[1]: ", i);
+
+	i++;
+	fmt.Println("i[2]: ", i);
+}
+```
+
+deferへ渡した関数が複数ある場合、その呼び出しはスタック( stack )される。呼び出し元の関数がreturnするとき、 defer へ渡した関数は LIFO(last-in-first-out) の順番で実行される。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("counting")
+
+	for i := 0; i < 10; i++ {
+		defer fmt.Println(i)
+	}
+
+	fmt.Println("done")
+}
+```
+
+## Pointers
+Goはポインタがある。`&変数`はアドレス、`*変数`は中身を表す。
+（ポインタって業務で使うん？）
+```go
+package main
+
+import "fmt"
+
+func main() {
+	i, j := 42, 2701
+
+	p := &i         // point to i
+	fmt.Println(*p) // read i through the pointer
+	*p = 21         // set i through the pointer
+	fmt.Println(i)  // see the new value of i
+
+	p = &j         // point to j
+	*p = *p / 37   // divide j through the pointer
+	fmt.Println(j) // see the new value of j
+}
+```
+
+## Structs
+構造体は他の言語と同じような扱い。
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+	X int
+	Y int
+}
+
+func main() {
+	v := Vertex{1, 2}
+	v.X = 4
+	fmt.Println(v.X)
+}
+```
+
+構造体へのアクセスはポインタを返しても行える。**フィールドXを持つstructのポインタpがある場合、フィールドXにアクセスするには `(*p).X `のように書くことができるが、この表記法は大変面倒なので、Goでは代わりに `p.X` と書くこともできる**。
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+	X int
+	Y int
+}
+
+func main() {
+	v := Vertex{1, 2}
+	p := &v
+	p.X = 1e9 //(*p).X ではないことに注目！
+	fmt.Println(v)
+}
+```
+
+## Arrays
+配列は固定長で、配列の書き方がPythonとは全く違うので注意。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var a [2]string //ココが他とは違う
+	a[0] = "Hello"  //扱い方は同じ
+	a[1] = "World"
+	fmt.Println(a[0], a[1])
+	fmt.Println(a)
+
+	primes := [6]int{2, 3, 5, 7, 11, 13}
+	fmt.Println(primes)
+}
+```
+
+## Slices
+スライスはスライスは配列への参照のようなもので、配列とは異なり可変長である。`a[low : high]`のようなコロンで区切られた二つのインデックス low と high の境界を指定することによってスライスが形成される。
+
+注意すべきところは、スライスはどんなデータも格納しておらず、単に元の配列の部分列を指す点である。**スライスの要素を変更すると、その元となる配列の対応する要素も変更され、同じ元となる配列を共有している他のスライスもその変更が反映される**。つまり、スライｓは浅いコピーをしている状態である。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	names := [4]string{
+		"John",
+		"Paul",
+		"George",
+		"Ringo",
+	}
+	fmt.Println(names)
+
+	a := names[0:2]
+	b := names[1:3]
+	fmt.Println(a, b)
+
+	b[0] = "XXX"
+	fmt.Println(a, b)
+	fmt.Println(names)
+}
+```
+
+### Creating a slice with make
+スライスは、組み込みの make 関数を使用して作成することができる。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// []intは配列の大きさがない＝可変長＝スライス
+	// スライスは元配列が無くても、大きさなし配列を宣言することで使える
+	a := make([]int, 5)
+	printSlice("a", a)
+
+	b := make([]int, 0, 5)
+	printSlice("b", b)
+
+	c := b[:2]
+	printSlice("c", c)
+
+	d := c[2:5]
+	printSlice("d", d)
+}
+
+func printSlice(s string, x []int) {
+	//len=今のスライスの大きさ、cap=元の配列の大きさ
+	fmt.Printf("%s len=%d cap=%d %v\n", s, len(x), cap(x), x)
+}
+```
+
+### Appending to a slice
+スライスへ新しい要素を追加するには、Goの組み込みの append を使う。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var s []int
+	printSlice(s)
+
+	// 「 func append(s []T, vs ...T) []T 」が定義
+	// append works on nil slices.
+	s = append(s, 0)
+	printSlice(s)
+
+	// The slice grows as needed.
+	s = append(s, 1)
+	printSlice(s)
+
+	// We can add more than one element at a time.
+	s = append(s, 2, 3, 4)
+	printSlice(s)
+}
+
+func printSlice(s []int) {
+	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
+}
+```
+
+## Range
+for ループに利用する range は、スライスや、マップ( map )をひとつずつ反復処理するために使う。スライスをrangeで繰り返す場合、rangeは反復毎に2つの変数を返す 
+- 1つ目の変数：インデックス( index )
+- 2つ目の変数：インデックスの場所の要素のコピー
+```go
+package main
+
+import "fmt"
+
+var pow = []int{1, 2, 4, 8, 16, 32, 64, 128}
+
+func main() {
+	for i, v := range pow {
+		fmt.Printf("2**%d = %d\n", i, v)
+	}
+}
+```
+
+インデックスや値は、 " _ "(アンダーバー) へ代入することで捨てることができる。しインデックスだけが必要なのであれば、2つ目の値を省略してもいい（例：`for i := range pow`）。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	pow := make([]int, 10)
+	for i := range pow {
+		pow[i] = 1 << uint(i) // == 2**i
+	}
+	for _, value := range pow {
+		fmt.Printf("%d\n", value)
+	}
+}
+```
+
+## Maps
+map はキーと値とを関連付ける辞書型のようなものである。マップのゼロ値は `nil` です。 nil マップはキーを持っておらず、またキーを追加することもできない。make 関数は指定された型のマップを初期化して、使用可能な状態で返す。
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+	Lat, Long float64
+}
+
+var m = map[string]Vertex{
+	"Bell Labs": Vertex{
+		40.68433, -74.39967,
+	},
+	"Google": Vertex{
+		37.42202, -122.08408,
+	},
+}
+
+func main() {
+	fmt.Println(m)
+}
+```
+
+### Mutating Maps
+- **m へ要素(elem)の挿入や更新**: `m[key] = elem`
+- **要素の取得**: `elem = m[key]`
+- **要素の削除**: `delete(m, key)`
+- **キーに対する要素が存在するか**: "elem, ok = m[key]"
+  - もし、 m に key があれば、変数 ok は true となり、存在しなければ、 ok は false となる。また、mapに key が存在しない場合、 elem はmapの要素の型のゼロ値となる。
+```go
+package main
+
+import "fmt"
+
+func main() {
+	m := make(map[string]int)
+
+	m["Answer"] = 42
+	fmt.Println("The value:", m["Answer"])
+
+	m["Answer"] = 48
+	fmt.Println("The value:", m["Answer"])
+
+	delete(m, "Answer")
+	fmt.Println("The value:", m["Answer"])
+
+	v, ok := m["Answer"]
+	fmt.Println("The value:", v, "Present?", ok)
+}
+```
+
+## Function values
+（あまり使わないやつ）
+関数も変数として扱え、他の変数のように関数に渡すことができる。関数値( function value )は、関数の引数に取ることもでき、戻り値としても利用できる。
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+func compute(fn func(float64, float64) float64) float64 {
+	return fn(3, 4)
+}
+
+func main() {
+	hypot := func(x, y float64) float64 {
+		return math.Sqrt(x*x + y*y)
+	}
+	fmt.Println(hypot(5, 12))
+
+	fmt.Println(compute(hypot))
+	fmt.Println(compute(math.Pow))
+}
+```
+
+## Function closures
+（未知の概念）
+ クロージャは、それ自身の外部から変数を参照する関数値である。 この関数は、参照された変数へアクセスして変えることができる。つまり、つまり、関数内にグローバル変数と関数が作れるってこと？
+ ```go
+ package main
+
+import "fmt"
+
+func adder() func(int) int {
+    sum := 0  // 関数の外側にある変数
+    return func(x int) int {
+        sum += x  // 外部の変数 `sum` にアクセスし、変更
+        return sum
+    }
+}
+
+func main() {
+    posAdder := adder()  // `adder()` を呼び出してクロージャを取得
+
+    fmt.Println(posAdder(1))  // 1
+    fmt.Println(posAdder(2))  // 3 (1 + 2)
+    fmt.Println(posAdder(3))  // 6 (1 + 2 + 3)
+}
+```
+
+# 文法: Methods and interfaces
+## Methods
+Goには、クラス( class )のしくみはないが、型にメソッド( method )を定義できる。メソッドは、特別なレシーバ( receiver )引数を関数に取り、func キーワードとメソッド名の間に自身の引数リストで表現する。
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type Vertex struct {
+	X, Y float64
+}
+
+func (v Vertex) Abs() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func main() {
+	v := Vertex{3, 4}
+	fmt.Println(v.Abs())
+}
+```
+
+structの型だけではなく、任意の型(type)にもメソッドを宣言できる。レシーバを伴うメソッドの宣言は、レシーバ型が同じパッケージにある必要があり、 他のパッケージに定義している型に対して、レシーバを伴うメソッドを宣言できない。
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type MyFloat float64
+
+func (f MyFloat) Abs() float64 {
+	if f < 0 {
+		return float64(-f)
+	}
+	return float64(f)
+}
+
+func main() {
+	f := MyFloat(-math.Sqrt2)
+	fmt.Println(f.Abs())
+}
+```
+
+ポインタレシーバでもメソッドを宣言できる。ポインタレシーバを持つメソッドは、レシーバが指す変数を変更できる。 レシーバ自身を更新することが多いため、変数レシーバよりもポインタレシーバの方が一般的である。
+
+:::details ポインタレシーバを使う理由
+- メソッドがレシーバが指す先の変数を変更するため
+- メソッドの呼び出し毎に変数のコピーを避ける
+:::
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type Vertex struct {
+	X, Y float64
+}
+
+func (v Vertex) Abs() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func (v *Vertex) Scale(f float64) {
+	v.X = v.X * f
+	v.Y = v.Y * f
+}
+
+func main() {
+	v := Vertex{3, 4}
+	v.Scale(10)
+	fmt.Println(v.Abs())
+}
+```
+
+## Interfaces
