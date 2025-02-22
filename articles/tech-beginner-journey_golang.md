@@ -3,7 +3,7 @@ title: "Golang初心者がゼロから学ぶ学習記録"
 emoji: "🐬"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [Golang]
-published: false
+published: true
 ---
 # はじめに
 ハロハロ～、Golangを諸事情で勉強することになったアヤノです。
@@ -18,8 +18,12 @@ published: false
 - 文法
   - [A Tour of Go](https://go-tour-jp.appspot.com/list)
   - [Effective Go — プログラミング言語 Go ドキュメント v0.1 documentation](http://go.shibu.jp/effective_go.html)
-- コーディングスタイル
-  - aaa
+  - [テスト駆動開発でGO言語を学びましょう](https://andmorefine.gitbook.io/learn-go-with-tests)
+- コーディングスタイル[^1]
+  - [knsh14/uber-style-guide-ja](https://github.com/knsh14/uber-style-guide-ja)
+  - [Go Style | styleguide](https://google.github.io/styleguide/go/)
+
+[^1]: 定期的に読み直す必要がありそう
 
 # 文法: Basics
 ## Imports
@@ -911,3 +915,46 @@ func main() {
 }
 ```
 
+# コーディングスタイル
+（新しい学びになった点を列挙）
+## Group Similar Declarations
+- 宣言をグループにまとめる
+  - グルーピングすることによって、変数名に差をつけないでグルーピングができる
+    - 変数名にやる必要が無いわけではない
+```go
+import (
+  "a"
+  "b"
+)
+
+const (
+  a = 1
+  b = 2
+)
+
+var (
+  a = 1
+  b = 2
+)
+
+type (
+  Area float64
+  Volume float64
+)
+```
+
+## Function Names
+関数名にはGoコミュニティの規則であるMixedCapsに従う。
+```go
+func HelloWorld() {
+    fmt.Println("Hello, World!")
+}
+
+func AddNumbers(a int, b int) int {
+    return a + b
+}
+
+func GetUserName(id int) string {
+    return fmt.Sprintf("User%d", id)
+}
+```
