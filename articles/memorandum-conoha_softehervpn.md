@@ -1,8 +1,8 @@
 ---
-title: "【ConoHaの備忘録】ConoHa VPSを使ったVPN構築"
+title: "【ConoHaの備忘録】ConoHa VPSを使ったSoftether VPN構築"
 emoji: "📓"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["conoha", "ubuntu", "softeher", "vpn"]
+topics: ["conoha", "ubuntu", "softethervpn", "vpn"]
 published: true
 ---
 # はじめに
