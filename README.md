@@ -4,7 +4,7 @@
 
 # 書きたい記事
 ```bash
-npx zenn new:article --slug [slug]
+pnpm zenn new:article --slug [slug]
 ```
 - 【Softetherの備忘録】Softether VPN ServerのCUI操作(memorandum-softether_vpn_server-cui)
 - 【プリキュア分析】キャラクターの特徴からシリーズの特定(tech-data-precute_analy_01)
