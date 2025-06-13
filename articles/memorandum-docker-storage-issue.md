@@ -1,9 +1,9 @@
 ---
-title: "Dockerで開発を続けていたら、WSL2の.vhdxが100GB超えしていた話とその対処法"
+title: "Windows＋Docker開発でパソコンの容量が100GBの圧迫！その原因と解決法"
 emoji: "📓"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [Docker, windows]
-published: false
+published: true
 ---
 # はじめに
 Dockerで呑気に開発していたら、いつの間にか100GBも占領されていたアヤノです。
@@ -15,8 +15,7 @@ Dockerは、ローカル環境を汚さず、どこでも・いつでも同じ�
 # TL;DR
 - Dockerは便利だけど、使い続けるとWSL2の仮想ディスクが **勝手に巨大化** する  
 - `docker system prune -a --volumes` で不要データは削除できるが、**仮想ディスクの物理サイズは自動で縮小されない**  
-- Windowsのディスク容量を本当に空けるには、**仮想ディスクを手動で最適化（トリム）** する必要がある  
-- `Optimize-VHD` という PowerShell コマンドで `.vhdx` を縮小できる（※ Hyper-V が必要）  
+- Windowsのディスク容量を本当に空けるには、**仮想ディスクを手動で最適化（トリム）** する必要がある
 - 今後のために、**こまめな削除・ホストマウント・自動化** など予防策も大切
 
 # なぜDockerでストレージが死ぬのか？
@@ -27,6 +26,22 @@ Dockerは開発環境を簡単に構築できますが、大量のデータをWS
 | **Dockerイメージ** | コンテナの元となるファイル群　| 
 | **コンテナ**       | 実際に動いている、あるいは停止中のアプリケーションの実態　| 
 | **ボリューム**     | データベースなどの永続データを保存　|
+
+:::details ディスク使用状況を調べたい
+ディスク使用状況をざっくり知るにはこのコマンドが便利です。
+
+```powershell
+docker system df
+
+# ex
+# >docker system df
+# TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+# Images          0         0         0B        0B
+# Containers      0         0         0B        0B
+# Local Volumes   0         0         0B        0B
+# Build Cache     0         0         0B        0B
+```
+:::
 
 # docker system pruneで仮想ディスクをきれいにする
 Dockerのデータを整理するときに使われるのは`docker system prune`です。これは、使われていないコンテナ、ネットワーク、イメージ、キャッシュなどを一括で削除してくれる便利なコマンドです。このコマンドを実行すると、不要なデータが一掃され、パソコンの空き容量が増えることが期待されます。
@@ -61,8 +76,8 @@ DockerのLinux環境のファイルは、WSL2の仮想ディスクファイル�
 この問題を放置しておくと、Dockerを使い続ける限り仮想ディスクのサイズがどんどん大きくなっていきます。そして、普通のファイル削除の感覚で `docker system prune` を繰り返しても、WSL2仮想ディスクのファイルサイズは減らず、気づいたときには100GBもDockerに占領されます。
 
 
-# 本当の解決策：WSL2仮想ディスクの手動最適化（WIndows Proエディション）
-`docker system prune` をいくら実行してもストレージ容量が戻らない原因は、WSL2の仮想ディスク（`.vhdx`）が肥大化しているためです。  これを解決するには、「手動で仮想ディスクを最適化（トリム）」する必要があります。以下の手順で、仮想ディスクのサイズを縮小できます。
+# 本当の解決策：WSL2仮想ディスクの手動最適化（Windows Proエディションの場合）
+`docker system prune` をいくら実行してもストレージ容量が戻らない原因は、WSL2の仮想ディスク（`.vhdx`）が肥大化しているためです。これを解決するには、「手動で仮想ディスクを最適化（トリム）」する必要があります。以下の手順で、仮想ディスクのサイズを縮小できます。下記のコマンドは全てPowerShellで実行してください。
 
 1. WSL上のDocker関連プロセスをすべて停止する
    ```powershell
@@ -94,6 +109,49 @@ DockerのLinux環境のファイルは、WSL2の仮想ディスクファイル�
 3. 入っていなければチェックを入れて「OK」→再起動で反映されます
 :::
 
+# 本当の解決策：WSL2仮想ディスクの手動最適化（Windows Homeエディションの場合）
+Windows Homeを使っている場合は、上記のHyper-Vを使う方法は使えない場合があります。下記で紹介する内容はDockerのデータを全て削除するモノなので、**正攻法ではない可能性が非常に高いです。（自己責任でお願いします）**。覚悟を持てた方は、下記のコマンドは全てPowerShellで実行してください。
+
+1. 全てのDockerのデータを削除する（Docker DesktopでもOK）
+   ```powershell
+   docker system prune -a --volumes
+   ```
+2. Docker Desktopを終了し、WSL全体を停止します。
+   ```powershell
+   # タスクトレイからDocker Desktopを右クリックし、「Quit Docker Desktop」を押して、Docker Desktopを閉じる
+
+   wsl --shutdown
+   ```
+3. WSLで動いているDocker関連のディストロ名を確認する
+   - この中にある「docker ~」を次の手順のために覚える。
+   ```powershell
+   wsl -l -v
+
+   # ex
+   # > wsl -l -v
+   #   NAME              STATE           VERSION
+   # * Ubuntu            Running         2
+   #   docker-desktop    Running         2
+   ```
+4. DockerのWSLディストロをアンインストール（登録解除）
+   ```powershell
+   # 「wsl --unregister [ディストロ]」のようにする
+   wsl --unregister docker-desktop
+   ```
+5. 肥大化した .vhdx ファイルの削除
+    - 下記のフォルダにある .vhdx を直接削除（または名前変更）します。
+      - `C:\Users\<UserName>\AppData\Local\Docker\wsl\disk\docker_data.vhdx`
+      - `C:\Users\<UserName>\AppData\Local\Docker\wsl\main\ext4.vhdx`
+6. Docker Desktop を起動し、WSL2環境の再生成を待つ
+
+:::details どこに仮想ディスクがあるかを調べる
+以下のコマンドでext4.vhdx のファイルパスを見つけることができます。
+
+```powershell
+Get-ChildItem -Path "$env:USERPROFILE\AppData\Local\Docker" -Recurse -Filter *.vhdx
+```
+:::
+
 # その他の対策と予防法
 仮想ディスクの最適化によって一時的に容量を取り戻すことはできますが、根本的な対策として、普段からストレージが膨らみにくい使い方を心がけることが重要です。ここでは、日常的にできる予防策や注意点を紹介します。
 
@@ -114,3 +172,6 @@ DockerのLinux環境のファイルは、WSL2の仮想ディスクファイル�
 
 1. 自動化スクリプトで定期的なクリーンアップ
     - `docker system prune` を週1で実行するような簡単なバッチファイルを作ってタスクスケジューラで実行するなど、メンテナンスをルーチン化するのも有効です。
+
+# おわりに
+Windows＋Docker開発する際はこの辺りに気を付けて、パソコンの容量が過度に圧迫されないようにしてください。また、定期的にパソコン内の掃除をしましょう。私みたいに100GBも圧迫してからの掃除はパソコンの寿命にも悪影響です。
