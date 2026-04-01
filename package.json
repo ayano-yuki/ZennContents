@@ -1,4 +1,7 @@
 {
+	"scripts": {
+		"scrap:generate": "node scrap/generate-md.ts"
+	},
 	"devDependencies": {
 		"@types/node": "^24.10.9",
 		"zenn-cli": "^0.3.1"

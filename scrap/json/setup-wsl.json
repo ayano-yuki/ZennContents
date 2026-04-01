@@ -1,0 +1,18 @@
+{
+  "title": "WSLのセットアップ",
+  "closed": false,
+  "archived": false,
+  "created_at": "2025-12-29",
+  "comments": [
+    {
+      "author": "yuki_ayano",
+      "created_at": "2025-12-29",
+      "body_markdown": "## WSLの初期化\n1. 登録されているディストリビューションを確認\n```\nwsl -l -v\n```\n\n2. 初期化したいディストリビューションを削除\n```\nwsl --unregister Ubuntu\n```\n\n3. インストールできるディストリビューションを確認\n```\nwsl --list --online\n```\n\n4. Linux ディストリビューションをインストール\n```\nwsl --install -d Ubuntu\n```"
+    },
+    {
+      "author": "yuki_ayano",
+      "created_at": "2025-12-29",
+      "body_markdown": "## WSLの有効化\n1. Windows の機能の有効化\n```\ndism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart\ndism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart\n```\n\n2. wslのインストール\n```\nwsl --set-default-version 2\nwsl --install -d Ubuntu\n```\n<!-- https://qiita.com/ryome/items/240f36923f5cb989da27 -->"
+    }
+  ]
+}

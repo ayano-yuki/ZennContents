@@ -1,0 +1,18 @@
+{
+  "title": "miseのセットアップ",
+  "closed": false,
+  "archived": false,
+  "created_at": "2026-04-01",
+  "comments": [
+    {
+      "author": "yuki_ayano",
+      "created_at": "2026-04-01",
+      "body_markdown": "## 環境の有効化\n\nPowerShellには、起動時に必ず読み込まれる設定ファイル（プロファイル）があります。ここに miseの`activate` コマンドを記述します。\n\n1. プロファイルが存在するか確認\n    ```powershell\n    # PowerShellで以下を実行して、プロファイルファイルの有無を確認します。\n    Test-Path $PROFILE\n\n    # `False` と表示された場合は、まだファイルが存在しないため、以下のコマンドで新規作成します。\n    New-Item -Type File -Path $PROFILE -Force\n    ```\n2. プロファイルに書き込む内容\n    ```powershell\n    # `$PROFILE`（通常は `Documents\\PowerShell\\Microsoft.PowerShell_profile.ps1`）をテキストエディタで開き、以下のコードを追記します。\n\n    # miseの有効化\n    # Get-Command で mise がインストールされているかチェックしてから実行する（エラー防止）\n    if (Get-Command \"mise\" -ErrorAction SilentlyContinue) {\n        mise activate powershell | Out-String | Invoke-Expression\n    }\n    ```\n\n> **【技術的な補足】**\n> `mise activate powershell` は、実行すると「PowerShell用の関数や環境設定コード」を文字列として画面に出力します。それを `Invoke-Expression`（略称 `iex`）に渡して実行させることで、現在のシェルセッションに `mise` の全機能を動的に組み込んでいます。"
+    },
+    {
+      "author": "yuki_ayano",
+      "created_at": "2026-04-01",
+      "body_markdown": "## 使い方（ディレクトリ別に環境を変える）\n\n`mise activate` を設定することで、プロジェクトごとに最適な開発環境が自動的に構築されます。\n\n1. 自動切り替えの仕組み\n    - プロジェクトのルートディレクトリに `.mise.toml` を配置すると、そのディレクトリに入った瞬間、指定したバージョンに切り替わります。\n\n    ```toml\n    # .mise.toml の例\n    [tools]\n    node = \"20.10.0\"\n    python = \"3.12\"\n    ```\n2. 導入のメリット\n   - **ディレクトリ移動で即座に反映:** `cd` でプロジェクトに入った瞬間にツールが切り替わります。\n   - **シェル補完:** `mise install [TAB]` などの補完が効くようになります。\n   - **環境変数の管理:** プロジェクト固有の環境変数（`DB_PASSWORD`など）も `.mise.toml` で管理可能です。"
+    }
+  ]
+}
