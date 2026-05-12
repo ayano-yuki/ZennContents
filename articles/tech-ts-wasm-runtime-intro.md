@@ -25,7 +25,7 @@ const p = new Point(10, 20);
 ````
 
 しかし、WebAssemblyを触り始めると、それらを意識する必要が出てきます。
-AssemblyScriptで `new Point(10, 20)` を生成するとき、実際には線形メモリと呼ばれる巨大なバイト列のどこかにオブジェクトが配置されます。`x` と `y` はメモリ上の決まった位置に書き込まれ、変数はその先頭アドレスを指す値として扱われます。つまり、TypeScriptでは単なる `p.x` だったものが、WASMの世界では「メモリ上の何バイト目を読むか」という話になります。
+AssemblyScriptで `new Point(10, 20)` を生成するとき、線形メモリと呼ばれる巨大なバイト列にオブジェクトが配置されます。`x` と `y` はメモリ上の決まった位置に書き込まれ、変数はその先頭アドレスを指す値として扱われます。つまり、TypeScriptでは単なる `p.x` だったものが、WASMでは「メモリ上の何バイト目を読むか」という話になります。
 
 ここまで読むと、WASMのメモリ構造の話じゃんと思うかもしれません。
 しかし、`ArrayBuffer` と `TypedArray` の違い、`Array<T>` がなぜ重いのか、GCが何を管理しているのか、といった話は、すべて「メモリ上でどう表現されるか」に繋がっています。
@@ -37,21 +37,21 @@ AssemblyScriptで `new Point(10, 20)` を生成するとき、実際には線形
 - `class` インスタンスのフィールドはどのように配置されるのか
 - `ArrayBuffer`、`TypedArray`、`Array<T>` は何が違うのか
 
----
+# AssemblyScriptとは
 
-# AssemblyScriptとは？
+AssemblyScriptとは、TypeScriptライクな構文でWASMを生成できるものです。
+構文がTypeScriptに近いため、フロントサイドのエンジニアでも短期間で習得しやすく、`npm install`で利用できる点が特徴です。
 
-AssemblyScriptは「TypeScriptっぽく書けるWASM言語」ですが、実行モデルまでTypeScriptと同じではありません。むしろその違いを見ることで、普段隠れている「値」「参照」「メモリ」の関係がかなり掴みやすくなります。
+この記事では、AssemblyScriptの公式ドキュメントに記載されているランタイムのメモリレイアウトをベースに説明します。細かいレイアウトはAssemblyScriptのバージョンやランタイム設定によって変わる可能性があります。
 
-:::message
-この記事ではAssemblyScriptの公式ドキュメントに記載されているランタイムのメモリレイアウトをベースに説明します。細かいレイアウトはAssemblyScriptのバージョンやランタイム設定によって変わる可能性があります。実装に強く依存するコードを書く場合は、必ず利用しているバージョンのドキュメントと生成されたWASMを確認してください。
-:::
+https://www.assemblyscript.org/
 
-## この記事で使った実験
 
-この記事は、手元で用意した小さなAssemblyScriptプログラムをもとに書いています。
+# この記事で使った環境
 
-条件は次の通りです。
+この記事は、下記の環境でAssemblyScript側でオブジェクトを作り、その参照を `usize` として返す関数を用意し、JavaScript側で、返ってきた値を線形メモリ上のオフセットとして扱い、周辺のバイト列をダンプして、メモリモデルを確認しました。。
+以降の話は、基本的にこの条件で実行したときの結果となります。
+
 
 | 項目 | 内容 |
 | --- | --- |
@@ -62,33 +62,14 @@ AssemblyScriptは「TypeScriptっぽく書けるWASM言語」ですが、実行�
 | 観測方法 | `WebAssembly.Memory` を `Uint8Array` / `DataView` で読む |
 | WAT出力 | `asc --textFile` |
 
-実験コードでは、AssemblyScript側でオブジェクトを作り、その参照を `usize` として返す関数を用意しました。
+**TODO：実験で使用したプログラムをリポジトリとして公開したほうがいいのでは？**
 
-```ts
-export function makeVec2Ptr(x: i32, y: i32): usize {
-  return changetype<usize>(new Vec2(x, y));
-}
-```
+# WASMの線形メモリモデルとは何か
 
-JavaScript側では、返ってきた値を線形メモリ上のオフセットとして扱い、周辺のバイト列をダンプしています。
-
-```js
-const ptr = Number(instance.exports.makeVec2Ptr(0x11223344, 0x55667788));
-const dv = new DataView(instance.exports.memory.buffer);
-
-console.log(dv.getUint32(ptr + 0, true).toString(16));
-console.log(dv.getUint32(ptr + 4, true).toString(16));
-```
-
-以降の「こう見えた」という話は、基本的にこの条件での観測結果です。WebAssemblyそのものの仕様、AssemblyScriptの公開ドキュメント、今回の実装依存の観測を混ぜないように注意しながら進めます。
-
-## WASMのメモリは「線形メモリ」
-
-WebAssemblyにはlinear memory、つまり線形メモリという概念があります。
-
+WebAssemblyには線形メモリという概念があります。
 これはざっくり言うと、`0` 番地から始まる連続したバイト列です。
 
-```txt
+```txt:線形メモリのイメージ
 address
 0        1        2        3        4        5        ...
 +--------+--------+--------+--------+--------+--------+
@@ -96,16 +77,15 @@ address
 +--------+--------+--------+--------+--------+--------+
 ```
 
-WASMの命令は、このメモリに対して値を読み書きできます。
-
-たとえばイメージとしては、次のような操作です。
+WASMの命令は、このメモリに対して値を読み書きを行います。
+イメージとしては、次のような操作です。
 
 ```wat
 i32.load   ;; あるアドレスから4バイト読んで i32 として扱う
 i32.store  ;; あるアドレスに i32 を4バイト書き込む
 ```
 
-JavaScript側から見ると、WASMのメモリは `WebAssembly.Memory` として扱えます。そして、その中身は `ArrayBuffer` として参照できます。
+これをTypeScript側から見ると、WASMのメモリは `WebAssembly.Memory` となり、その中身である `ArrayBuffer` として参照しています。
 
 ```ts
 const memory = instance.exports.memory as WebAssembly.Memory;
@@ -115,6 +95,8 @@ const bytes = new Uint8Array(memory.buffer);
 TypeScriptエンジニア向けに言うなら、WASMのメモリは「巨大な `ArrayBuffer` を `Uint8Array` や `DataView` で覗いている」ようなものです。
 
 もちろん実際のWASM実行環境はそれだけではありません。関数呼び出し、値スタック、ローカル変数、テーブル、インポート・エクスポートなどもあります。ただ、`class` や配列のようなデータ構造を理解するうえでは、まず「線形メモリ上のどこかにバイト列として置かれる」という見方が重要です。
+
+---
 
 ## AssemblyScriptはTypeScriptではない
 
