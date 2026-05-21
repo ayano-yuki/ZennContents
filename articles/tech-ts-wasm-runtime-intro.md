@@ -3,7 +3,7 @@ title: "TypeScriptエンジニアのためのWASMランタイム入門 - Assembl
 emoji: "📚"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [typescript, wasm, assemblyscript]
-published: false
+published: true
 ---
 
 # はじめに
@@ -41,15 +41,18 @@ AssemblyScriptで `new Point(10, 20)` を生成するとき、線形メモリと
 
 AssemblyScriptとは、TypeScriptライクな構文でWASMを生成できるものです。
 構文がTypeScriptに近いため、フロントサイドのエンジニアでも短期間で習得しやすく、`npm install`で利用できる点が特徴です。
-細かいランタイムのメモリレイアウトはAssemblyScriptのバージョンやランタイム設定によって変わる可能性があります。
+
+
+※細かいランタイムのメモリレイアウトはAssemblyScriptのバージョンやランタイム設定によって変わる可能性があります。
 
 https://www.assemblyscript.org/
 
 
 # この記事で使った環境
 
-この記事は、下記の環境でAssemblyScript側で「オブジェクト作成と、その参照を `usize` として返す関数」を用意しました。またJavaScript側で、返ってきた値を線形メモリ上のオフセットとして扱い、周辺のバイト列をダンプして、メモリモデルを確認しました。
-以降の話は、基本的にこの条件で実行したときの結果となります。
+この記事は、AssemblyScript側で「オブジェクト作成と、その参照を `usize` として返す関数」を用意しました。またJavaScript側で、返ってきた値を線形メモリ上のオフセットとして扱い、周辺のバイト列をダンプして、メモリモデルを確認しました。
+
+実験で使用したプログラムは下記のGithubです。また以降の話は、基本的にこの条件で実行したときの結果となります。
 
 
 | 項目 | 内容 |
