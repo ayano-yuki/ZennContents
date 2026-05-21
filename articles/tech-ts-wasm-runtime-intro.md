@@ -41,15 +41,14 @@ AssemblyScriptで `new Point(10, 20)` を生成するとき、線形メモリと
 
 AssemblyScriptとは、TypeScriptライクな構文でWASMを生成できるものです。
 構文がTypeScriptに近いため、フロントサイドのエンジニアでも短期間で習得しやすく、`npm install`で利用できる点が特徴です。
-
-この記事では、AssemblyScriptの公式ドキュメントに記載されているランタイムのメモリレイアウトをベースに説明します。細かいレイアウトはAssemblyScriptのバージョンやランタイム設定によって変わる可能性があります。
+細かいランタイムのメモリレイアウトはAssemblyScriptのバージョンやランタイム設定によって変わる可能性があります。
 
 https://www.assemblyscript.org/
 
 
 # この記事で使った環境
 
-この記事は、下記の環境でAssemblyScript側でオブジェクトを作り、その参照を `usize` として返す関数を用意し、JavaScript側で、返ってきた値を線形メモリ上のオフセットとして扱い、周辺のバイト列をダンプして、メモリモデルを確認しました。。
+この記事は、下記の環境でAssemblyScript側で「オブジェクト作成と、その参照を `usize` として返す関数」を用意しました。またJavaScript側で、返ってきた値を線形メモリ上のオフセットとして扱い、周辺のバイト列をダンプして、メモリモデルを確認しました。
 以降の話は、基本的にこの条件で実行したときの結果となります。
 
 
@@ -62,7 +61,7 @@ https://www.assemblyscript.org/
 | 観測方法 | `WebAssembly.Memory` を `Uint8Array` / `DataView` で読む |
 | WAT出力 | `asc --textFile` |
 
-**TODO：実験で使用したプログラムをリポジトリとして公開したほうがいいのでは？**
+https://github.com/ayano-yuki/assemblyscript-memory-layout-lab
 
 # WASMの線形メモリモデルとは何か
 
@@ -96,9 +95,7 @@ TypeScriptエンジニア向けに言うなら、WASMのメモリは「巨大な
 
 もちろん実際のWASM実行環境はそれだけではありません。関数呼び出し、値スタック、ローカル変数、テーブル、インポート・エクスポートなどもあります。ただ、`class` や配列のようなデータ構造を理解するうえでは、まず「線形メモリ上のどこかにバイト列として置かれる」という見方が重要です。
 
----
-
-## AssemblyScriptはTypeScriptではない
+# AssemblyScriptはTypeScriptではない
 
 AssemblyScriptはTypeScriptに似た構文で書けます。
 
@@ -144,7 +141,7 @@ class User {
 
 この「TypeScriptっぽい見た目」と「WASMらしい実体」のギャップが、AssemblyScriptを教材として面白くしているところです。
 
-## メモリの大まかな区画
+# メモリの大まかな区画
 
 AssemblyScriptの公式ドキュメントでは、線形メモリは大まかに次のような領域に分かれると説明されています。
 
@@ -185,7 +182,7 @@ address 1024
 
 ここで大事なのは、「参照」は魔法ではなく、最終的にはメモリ上の位置を表す値だということです。
 
-## マネージドオブジェクトにはヘッダがある
+# マネージドオブジェクトにはヘッダがある
 
 AssemblyScriptの管理対象オブジェクトには、ランタイムが使うヘッダがあります。
 
@@ -222,7 +219,7 @@ TypeScriptの感覚だと、オブジェクトは「プロパティを持った�
 
 このペイロード部分に、`class` のフィールドや、配列の管理情報、バッファの生データなどが置かれます。
 
-## classインスタンスの実体
+# classインスタンスの実体
 
 では、`class` はどう配置されるのでしょうか。
 
@@ -267,7 +264,7 @@ vec.y  => i32.load(ptr + 4)
 
 もちろん、実際のコンパイラ出力は最適化や周辺処理によって変わります。ただ、オブジェクトのフィールドアクセスを「参照 + オフセット」として理解できると、WASMのメモリモデルが一気に見えやすくなります。
 
-## フィールド順とパディング
+# フィールド順とパディング
 
 もう少しだけ現実的な例を見てみます。
 
@@ -323,7 +320,7 @@ TypeScriptではこのようなことを気にする場面はほぼありませ�
 
 `tag` は1バイト書き込みなので `i32.store8`、`value` は4バイトの `i32.store offset=4` になっています。ソースコードのフィールドが、WASM命令では「何バイトを、どのオフセットに書くか」へ落ちていることが見えます。
 
-## `@unmanaged` なクラス
+# `@unmanaged` なクラス
 
 AssemblyScriptには `@unmanaged` というデコレータがあります。
 
@@ -348,7 +345,7 @@ class Vec2 {
 
 「TypeScriptっぽいクラス」から「構造体としてのメモリ表現」へ近づく機能だと思うと理解しやすいです。
 
-## ArrayBufferは生のバイト列
+# ArrayBufferは生のバイト列
 
 次に配列系のデータ構造を見ていきます。
 
@@ -398,7 +395,7 @@ export function makeArrayBufferPtr(): usize {
 
 ただし `ArrayBuffer` だけでは、そこに入っている値の型はわかりません。そこで登場するのが `TypedArray` です。
 
-## TypedArrayはバッファに被せるビュー
+# TypedArrayはバッファに被せるビュー
 
 `TypedArray` は、`ArrayBuffer` を特定の型の連続データとして見るためのビューです。
 
@@ -465,7 +462,7 @@ ArrayBuffer payload
 
 `ArrayBuffer` は生のメモリ、`TypedArray` はその見方です。
 
-## Array<T>はTypedArrayより少しリッチ
+# Array<T>はTypedArrayより少しリッチ
 
 AssemblyScriptには通常の配列 `Array<T>` もあります。
 
@@ -542,7 +539,7 @@ index
 
 もちろん、コンパイラが適切なWASM命令に落としてくれるので、普段はこれを手で書く必要はありません。ただ、「配列アクセス = メモリアドレス計算 + load」と考えられるようになると、WASMの実行モデルがずっと具体的になります。
 
-## StaticArray<T>という選択肢
+# StaticArray<T>という選択肢
 
 AssemblyScriptには `StaticArray<T>` もあります。
 
@@ -563,7 +560,7 @@ StaticArray<T> payload
 
 可変長の便利さが必要なら `Array<T>`、固定長でメモリ表現を素直にしたいなら `StaticArray<T>`、生のバイト列を扱いたいなら `ArrayBuffer`、型付きビューが欲しいなら `TypedArray`、という見方をすると整理しやすいです。
 
-## stringはUTF-16として見えた
+# stringはUTF-16として見えた
 
 今回の実験では、文字列も少しだけ観測しました。
 
@@ -598,7 +595,7 @@ utf16 code units = [65, 12354]
 
 ただし、この例は文字列リテラルです。静的領域に置かれる文字列と、実行時に動的生成される文字列では、配置場所やGCとの関係が変わる可能性があります。ここも「文字列は常にこう」と一般化しすぎない方が安全です。
 
-## GCヘッダも少しだけ覗ける
+# GCヘッダも少しだけ覗ける
 
 AssemblyScriptの `incremental` runtimeでは、`__pin`、`__unpin`、`__collect` を使ってGCと関係する状態変化も観測できます。
 
@@ -614,7 +611,7 @@ after unpin:    colorBits = 1
 
 ただし、これは特に実装依存が強い部分です。記事やLTで扱うなら、「AssemblyScript 0.28.14のincremental runtimeでは、今回こう観測できた」という言い方に留めるのがよいです。
 
-## JS側からメモリを覗く
+# JS側からメモリを覗く
 
 WASMの面白いところは、線形メモリをJavaScript側から覗けることです。
 
@@ -657,7 +654,7 @@ console.log(dv.getUint32(ptr + 0, true).toString(16)); // 11223344
 
 TypeScriptでは `buffer[0]` のように直接読むことはありませんが、WASMの線形メモリとして見ると、バッファの中身は本当にバイト列として存在しています。
 
-## 「参照」はアドレスである
+# 「参照」はアドレスである
 
 ここまでの話をまとめると、AssemblyScriptの管理対象オブジェクトは次のように考えられます。
 
@@ -687,7 +684,7 @@ console.log(a.value); // 2
 
 AssemblyScriptとWASMでは、その参照が線形メモリ上の数値として見える場面があります。だからこそ、普段は抽象化されている参照の正体を理解しやすいのです。
 
-## TypeScriptエンジニアが得られる視点
+# TypeScriptエンジニアが得られる視点
 
 AssemblyScriptのメモリレイアウトを知ったからといって、明日からTypeScriptでポインタ演算をするわけではありません。
 
@@ -706,7 +703,7 @@ AssemblyScriptのメモリレイアウトを知ったからといって、明日
 
 TypeScriptしか書いてこなかった人にとって、AssemblyScriptは「いきなりCやRustに飛び込む前に、見慣れた構文でメモリを観察できる」ちょうどいい入口になります。
 
-## まとめ
+# まとめ
 
 TypeScriptでは、オブジェクトや配列のメモリ表現はJavaScriptエンジンに隠されています。
 
@@ -730,7 +727,7 @@ TypeScriptでは、オブジェクトや配列のメモリ表現はJavaScriptエ
 
 その変換の途中を少しだけ覗けるようになると、TypeScriptで書いている普段のコードも、WASMとの境界にあるコードも、前より立体的に見えるようになります。
 
-## 参考
+# 参考
 
 - [AssemblyScript Runtime](https://www.assemblyscript.org/runtime.html)
 - [AssemblyScript Array](https://www.assemblyscript.org/stdlib/array.html)
